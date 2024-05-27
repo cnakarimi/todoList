@@ -5,6 +5,7 @@ import {
   AiTwotoneDelete,
   AiOutlineMenu,
   AiOutlineClose,
+  AiOutlineArrowRight,
 } from "react-icons/ai";
 import { Task } from "./Interface";
 import uuid from "react-uuid";
@@ -18,9 +19,13 @@ export default function Content() {
   };
 
   const addTask = (): void => {
-    const newTask = { taskName: task, completed: false, id: uuid() };
+    const newTask = {
+      taskName: task,
+      completed: false,
+      id: uuid(),
+      showTask: false,
+    };
     setTodoList([...todoList, newTask]);
-    console.log(todoList);
     setTask("");
   };
 
@@ -39,57 +44,81 @@ export default function Content() {
     setTodoList(newTodos);
   };
 
-  const editTodo = (id: string, newText: string) => {
-    const updateTodos = todoList.map((todo) => {
-      if (todo.id === id) {
-        return { ...todo, taskName: newText };
-      }
-      return todo;
-    });
-    setTodoList(updateTodos);
-    console.log(updateTodos);
+  const showInputHandler = (selectedTodoId: string) => {
+    const newTodos = todoList.map((todo) =>
+      todo.id === selectedTodoId ? { ...todo, showTask: !todo.showTask } : todo
+    );
+    setTodoList(newTodos);
+  };
+
+  const updateTodoHandler = (id: string, updatedTodo: Task) => {
+    const updatedItems = todoList.map((todo) =>
+      todo.id === id ? updatedTodo : todo
+    );
+    setTodoList(updatedItems);
   };
 
   const todos = todoList.map((todo) => (
-    <li
-      key={todo.id}
-      className="text-white border-b-2 border-secondary py-3 flex justify-between"
-    >
-      <p className="pl-5 relative">
-        {todo.taskName}
-        {todo.completed && <p className="border absolute top-1/2 w-full"></p>}
-      </p>
+    <>
+      <li
+        key={todo.id}
+        className="text-white border-b-2 border-secondary py-3 flex justify-between"
+      >
+        <p className="pl-5 relative">
+          {todo.taskName}
+          {todo.completed && <p className="border absolute top-1/2 w-full"></p>}
+        </p>
 
-      <div className="flex pr-5">
-        {!todo.completed && (
-          <AiOutlineCheck
+        <div className="flex pr-5">
+          {!todo.completed ? (
+            <AiOutlineCheck
+              className="mr-2	cursor-pointer"
+              onClick={() => {
+                taskCompletedHandler(todo);
+              }}
+            />
+          ) : (
+            <AiOutlineClose
+              className="mr-2	cursor-pointer"
+              onClick={() => {
+                taskCompletedHandler(todo);
+              }}
+            />
+          )}
+          <AiOutlineEdit
+            className="mr-2	cursor-pointer"
+            onClick={() => showInputHandler(todo.id)}
+          />
+          <AiTwotoneDelete
             className="mr-2	cursor-pointer"
             onClick={() => {
-              taskCompletedHandler(todo);
+              deleteTask(todo.id);
             }}
           />
-        )}
-        {todo.completed && (
-          <AiOutlineClose
-            className="mr-2	cursor-pointer"
-            onClick={() => {
-              taskCompletedHandler(todo);
-            }}
+          <AiOutlineMenu className="mr-2	cursor-pointer" />
+        </div>
+      </li>
+
+      {todo.showTask && (
+        <div className="flex items-center mt-3">
+          <AiOutlineArrowRight className="text-white rotate mx-2" />
+
+          <input
+            className=" w-1/2 h-10 bg-secondary rounded-xl px-3 placeholder-white text-base"
+            type="text"
+            placeholder="Update Selected Task"
+            value={task}
           />
-        )}
-        <AiOutlineEdit
-          className="mr-2	cursor-pointer"
-          onClick={(e) => editTodo(todo.id, e.target.value)}
-        />
-        <AiTwotoneDelete
-          className="mr-2	cursor-pointer"
-          onClick={() => {
-            deleteTask(todo.id);
-          }}
-        />
-        <AiOutlineMenu className="mr-2	cursor-pointer" />
-      </div>
-    </li>
+
+          <button
+            type="submit"
+            className="bg-secondary rounded-xl py-2 px-2 ml-4 text-base"
+          >
+            Done
+          </button>
+        </div>
+      )}
+    </>
   ));
 
   return (
@@ -99,10 +128,11 @@ export default function Content() {
           className=" w-3/4 h-10 bg-secondary rounded-xl px-3 placeholder-white"
           type="text"
           name="task"
-          placeholder="Enter a new task"
+          placeholder="Enter a new Task"
           value={task}
           onChange={handleChange}
         />
+
         <button
           onClick={addTask}
           type="submit"
