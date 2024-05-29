@@ -9,6 +9,7 @@ import {
 } from "react-icons/ai";
 import { Task } from "./Interface";
 import uuid from "react-uuid";
+import { Reorder } from "framer-motion";
 
 export default function Content() {
   const [task, setTask] = useState<string>("");
@@ -51,17 +52,21 @@ export default function Content() {
     setTodoList(newTodos);
   };
 
-  const updateTodoHandler = (id: string, updatedTodo: Task) => {
-    const updatedItems = todoList.map((todo) =>
-      todo.id === id ? updatedTodo : todo
-    );
-    setTodoList(updatedItems);
+  const editTodo = (editedText: string, todoId: string) => {
+    const updatedTodos = todoList.map((todo) => {
+      if (todo.id === todoId) {
+        return { ...todo, taskName: editedText };
+      }
+      return todo;
+    });
+    setTodoList(updatedTodos);
   };
 
   const todos = todoList.map((todo) => (
     <>
-      <li
+      <Reorder.Item
         key={todo.id}
+        value={todo}
         className="text-white border-b-2 border-secondary py-3 flex justify-between"
       >
         <p className="pl-5 relative">
@@ -97,7 +102,7 @@ export default function Content() {
           />
           <AiOutlineMenu className="mr-2	cursor-pointer" />
         </div>
-      </li>
+      </Reorder.Item>
 
       {todo.showTask && (
         <div className="flex items-center mt-3">
@@ -107,12 +112,14 @@ export default function Content() {
             className=" w-1/2 h-10 bg-secondary rounded-xl px-3 placeholder-white text-base"
             type="text"
             placeholder="Update Selected Task"
-            value={task}
+            value={todo.taskName}
+            onChange={(e) => editTodo(e.target.value, todo.id)}
           />
 
           <button
             type="submit"
             className="bg-secondary rounded-xl py-2 px-2 ml-4 text-base"
+            onClick={() => showInputHandler(todo.id)}
           >
             Done
           </button>
@@ -141,9 +148,14 @@ export default function Content() {
           Add
         </button>
       </div>
-      <ul className="w-2/3 mt-24 border rounded-md border-secondary text-3xl px-5 py-8">
+      <Reorder.Group
+        axis="y"
+        values={todoList}
+        onReorder={setTodoList}
+        className="w-2/3 mt-24 border rounded-md border-secondary text-3xl px-5 py-8"
+      >
         {todos}
-      </ul>
+      </Reorder.Group>
     </div>
   );
 }
