@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import {
   AiOutlineCheck,
   AiOutlineEdit,
@@ -8,27 +8,20 @@ import {
   AiOutlineArrowRight,
 } from "react-icons/ai";
 import { Task } from "./Interface";
-import uuid from "react-uuid";
 import { Reorder } from "framer-motion";
+import Input from "./Input";
 
-export default function Content() {
+export default function Content({ countTasks }) {
   const [task, setTask] = useState<string>("");
   const [todoList, setTodoList] = useState<Task[]>([]);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setTask(event.target.value);
+  const getTodos = (todos: Task[]) => {
+    setTodoList(todos);
   };
 
-  const addTask = (): void => {
-    const newTask = {
-      taskName: task,
-      completed: false,
-      id: uuid(),
-      showTask: false,
-    };
-    setTodoList([...todoList, newTask]);
-    setTask("");
-  };
+  useEffect(() => {
+    countTasks(todoList.length);
+  });
 
   const deleteTask = (taskId: string): void => {
     setTodoList(
@@ -67,7 +60,7 @@ export default function Content() {
       <Reorder.Item
         key={todo.id}
         value={todo}
-        className="text-white border-b-2 border-secondary py-3 flex justify-between"
+        className="text-fourth border-b-2 border-secondary py-3 flex justify-between"
       >
         <p className="pl-5 relative">
           {todo.taskName}
@@ -130,24 +123,7 @@ export default function Content() {
 
   return (
     <div className="flex flex-col items-center pt-24">
-      <div className="w-1/2 ">
-        <input
-          className=" w-3/4 h-10 bg-secondary rounded-xl px-3 placeholder-white"
-          type="text"
-          name="task"
-          placeholder="Enter a new Task"
-          value={task}
-          onChange={handleChange}
-        />
-
-        <button
-          onClick={addTask}
-          type="submit"
-          className="bg-secondary rounded-xl py-2 px-2 ml-4"
-        >
-          Add
-        </button>
-      </div>
+      <Input sendTodos={getTodos} />
       <Reorder.Group
         axis="y"
         values={todoList}

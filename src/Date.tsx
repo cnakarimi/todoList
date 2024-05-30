@@ -16,13 +16,13 @@ const nthNumber = (number: number) => {
   }
 };
 
-export default function Date() {
+export default function Date({ quantity }: number) {
   return (
     <div>
       <div>{`${currentDate[0]}, ${
         currentDate[1] + nthNumber(+currentDate[1])
       }`}</div>
-      <p className="text-base pt-2">3 Active Tasks</p>
+      <p className="text-base pt-2">{`${quantity} Active Tasks`}</p>
     </div>
   );
 }
