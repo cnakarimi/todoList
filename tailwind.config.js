@@ -7,6 +7,7 @@ export default {
       secondary: "#475569",
       third: "#e2e8f0",
       fourth: "#cbd5e1",
+      fifth: "#047857",
       white: "#f1f5f9",
     },
     extend: {},

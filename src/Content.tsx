@@ -12,23 +12,31 @@ import { Reorder } from "framer-motion";
 import Input from "./Input";
 
 export default function Content({ countTasks }) {
-  const [task, setTask] = useState<string>("");
   const [todoList, setTodoList] = useState<Task[]>([]);
 
-  const getTodos = (todos: Task[]) => {
-    setTodoList(todos);
+  const addTodo = (newTodo: Task) => {
+    const updatedTodoList = [...todoList, newTodo];
+    setTodoList(updatedTodoList);
+    localStorage.setItem("todoList", JSON.stringify(updatedTodoList));
   };
+
+  useEffect(() => {
+    const storedItems = localStorage.getItem("todoList");
+
+    if (storedItems) {
+      const parsedItems: Task[] = JSON.parse(storedItems);
+      setTodoList(parsedItems);
+    }
+  }, []);
 
   useEffect(() => {
     countTasks(todoList.length);
   });
 
   const deleteTask = (taskId: string): void => {
-    setTodoList(
-      todoList.filter((task) => {
-        return task.id != taskId;
-      })
-    );
+    const updatedTodoList = todoList.filter((task) => task.id !== taskId);
+    setTodoList(updatedTodoList);
+    localStorage.setItem("todoList", JSON.stringify(updatedTodoList));
   };
 
   const taskCompletedHandler = (selectedTodo: Task) => {
@@ -36,6 +44,7 @@ export default function Content({ countTasks }) {
       todo === selectedTodo ? { ...todo, completed: !todo.completed } : todo
     );
     setTodoList(newTodos);
+    localStorage.setItem("todoList", JSON.stringify(newTodos));
   };
 
   const showInputHandler = (selectedTodoId: string) => {
@@ -53,6 +62,7 @@ export default function Content({ countTasks }) {
       return todo;
     });
     setTodoList(updatedTodos);
+    localStorage.setItem("todoList", JSON.stringify(updatedTodos));
   };
 
   const todos = todoList.map((todo) => (
@@ -102,7 +112,7 @@ export default function Content({ countTasks }) {
           <AiOutlineArrowRight className="text-white rotate mx-2" />
 
           <input
-            className=" w-1/2 h-10 bg-secondary rounded-xl px-3 placeholder-white text-base"
+            className=" w-1/2 h-10 list rounded-xl px-3 placeholder-white text-base"
             type="text"
             placeholder="Update Selected Task"
             value={todo.taskName}
@@ -111,7 +121,7 @@ export default function Content({ countTasks }) {
 
           <button
             type="submit"
-            className="bg-secondary rounded-xl py-2 px-2 ml-4 text-base"
+            className="bg-fifth text-white rounded-xl py-2 px-2 ml-4 text-base"
             onClick={() => showInputHandler(todo.id)}
           >
             Done
@@ -123,7 +133,7 @@ export default function Content({ countTasks }) {
 
   return (
     <div className="flex flex-col items-center pt-24">
-      <Input sendTodos={getTodos} />
+      <Input addTodo={addTodo} />
       <Reorder.Group
         axis="y"
         values={todoList}

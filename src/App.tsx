@@ -11,7 +11,9 @@ function App() {
   return (
     <>
       <Header quantity={tasksAmount} />
+      <canvas id="granim-canvas"></canvas>
       <Content countTasks={getNumberOfTasks} />
+      <script src="granim.min.ts"></script>
     </>
   );
 }
